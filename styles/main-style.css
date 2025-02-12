@@ -1,0 +1,16 @@
+* {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.student-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin: 20px 10px;
+}
+
+.student-container * {
+    background-color: rgb(232, 231, 231);
+    border-radius: 10px;
+    padding: 10px;
+}
