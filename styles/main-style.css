@@ -3,7 +3,8 @@
 }
 
 body {
-    margin: 15px 20px;
+    margin: 0;
+    padding: 0 10px;
 }
 
 .student-container {
@@ -21,7 +22,8 @@ body {
 
 a {
     text-decoration: none;
-    color: rgb(73, 72, 72);
+    /* color: rgb(73, 72, 72); */
+    color: inherit;
 }
 
 ul {
@@ -33,4 +35,8 @@ ul {
 .top-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    background-color: rgb(44, 44, 44);
+    color: rgb(230, 227, 227);
 }
