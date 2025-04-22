@@ -18,21 +18,37 @@
 </body>
 
 <script>
-    let logs;
-
     const responseAPI = async () => {
-        const res = await fetch('http://localhost:3000/DATA-full-logs')
-        const data = await res.json()
-        logs = data
-        console.log(logs)
+        let names = await getData('http://localhost:3000/DATA-names')
+        let logs = await getData('http://localhost:3000/DATA-full-logs')
+        let roomNums = await getData('http://localhost:3000/DATA-room-nums')
         logs.reverse()
+
         const logContainer = document.querySelector('.log-container')
+
         for (let i = 0; i < logs.length; i++) {
             let log = document.createElement('div')
             log.classList.add('log')
-            log.textContent = `NAME (${logs[i].student_id}) scanned at ROOM NUMBER (${logs[i].ip}) at ${logs[i].time}`
+
+            let student_name = names.find(nameDict => nameDict.student_id === logs[i].student_id);
+
+            if (!student_name) student_name = 'NAME'
+            else student_name = student_name.name
+
+            let room_num = roomNums.find(roomDict => roomDict.ip === logs[i].ip);
+
+            if (!room_num) room_num = 'ROOM NUMBER'
+            else room_num = room_num.room_number
+
+            log.textContent = `${student_name} (${logs[i].student_id}) scanned at Room ${room_num} (${logs[i].ip}) at ${logs[i].time}`
             logContainer.appendChild(log)
         }
+    }
+
+    async function getData(src) {
+        const res = await fetch(src)
+        const data = await res.json()
+        return data;
     }
 
     responseAPI();

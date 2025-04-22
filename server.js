@@ -36,7 +36,13 @@ app.get('/DATA-full-logs', (req, res) => {
   })
 })
 
+app.get('/DATA-names', (req, res) => {
+  db.all(`SELECT student_id, name FROM names`, [], (err, rows) => res.json(rows))
+})
 
+app.get('/DATA-room-nums', (req, res) => {
+  db.all(`SELECT ip, room_number FROM rooms`, [], (err, rows) => res.json(rows))
+})
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
