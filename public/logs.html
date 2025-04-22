@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="main-style.css">
+</head>
+<body>
+    <div class="top-header">
+        <h1>THE ISS</h1>
+        <ul>
+            <li><a href="index.html">home</a></li>
+            <li><a href="student-list.html">logs</a></li>
+        </ul>
+    </div>
+    <div class="log-container"></div>
+</body>
+
+<script>
+    let logs;
+
+    const responseAPI = async () => {
+        const res = await fetch('http://localhost:3000/DATA-full-logs')
+        const data = await res.json()
+        logs = data
+        console.log(logs)
+        logs.reverse()
+        const logContainer = document.querySelector('.log-container')
+        for (let i = 0; i < logs.length; i++) {
+            let log = document.createElement('div')
+            log.classList.add('log')
+            log.textContent = `NAME (${logs[i].student_id}) scanned at ROOM NUMBER (${logs[i].ip}) at ${logs[i].time}`
+            logContainer.appendChild(log)
+        }
+    }
+
+    responseAPI();
+</script>
+</html>
