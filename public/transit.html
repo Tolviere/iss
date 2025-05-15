@@ -13,8 +13,9 @@
     <div class="top-header"> 
         <h1>THE ISS</h1> 
         <ul> 
-            <li><a href="index.html">home</a></li> 
-            <li><a href="student-list.html">logs</a></li> 
+            <li><a href="index.html">home</a></li>
+            <li><a href="transit.html">transit</a></li>
+            <li><a href="logs.html">logs</a></li>
         </ul> 
     </div> 
 
@@ -35,7 +36,8 @@
        // let roomNums = await getData('http://localhost:3000/DATA-room-nums') 
         let transits = await getData('http://localhost:3000/DATA-transit-going') 
 
-        for (let i = current_id; i < transits.length; i++) { 
+        for (let i = 0; i < transits.length; i++) { 
+            if (document.querySelector(`#log-${transits[i].id}`)) continue;
             let transit = document.createElement('div') 
             transit.classList.add('transit') 
 
@@ -55,12 +57,14 @@
             transit.setAttribute('data-time', transits[i].time) 
             transit.setAttribute('data-student-id', transits[i].student_id) 
             transit.setAttribute('data-student-name', student_name) 
-            transit.setAttribute('data-room-num', room_num) 
+            transit.setAttribute('data-room-num', room_num)
+
+            transit.id = `log-${transits[i].id}`
 
             let circle = document.createElement('div') 
             circle.classList.add('circle') 
-            if (mins > 10) circle.style.backgroundColor = red
-            else if (mins > 5) circle.style.backgroundColor = yellow
+            if (mins >= 10) circle.style.backgroundColor = red
+            else if (mins >= 5) circle.style.backgroundColor = yellow
 
             transit.appendChild(circle) 
 
@@ -91,17 +95,18 @@
             let mins = Math.floor(elapsed_time / 60)
             let secs = elapsed_time - mins * 60
 
+            console.log(mins)
+            let circle = child.querySelector('.circle')
+            if (mins >= 10) circle.style.backgroundColor = red
+            else if (mins >= 5) circle.style.backgroundColor = yellow
+
             if (mins < 10) mins = `0${mins}`
             if (secs < 10) secs = `0${secs}`
 
             let timeElement = child.querySelector('.time')
             timeElement.textContent = `${mins}:${secs}`
-
-            let circle = child.querySelector('.circle')
-            if (mins > 10) circle.style.backgroundColor = red
-            else if (mins > 5) circle.style.backgroundColor = yellow
-
-            if(allTransit.find(log => log.student_id === child.getAttribute('data-student-id') && log.transit_status !== 'GOING')) { 
+            console.log('ongoabo')
+            if(allTransit.find(log => log.student_id == child.getAttribute('data-student-id')).transit_status !== 'GOING') { 
                 transit_container.removeChild(child) 
             } 
         }) 
