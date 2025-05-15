@@ -51,7 +51,13 @@ ul {
 .transit-container, .log-container { 
     display: flex; 
     flex-direction: column; 
-    height: 100px; 
+    /*height: 100px;*/ 
+    /*background-color: rgb(244, 244, 244); */
+}
+
+.log-container {
+    width: fit-content;
+    margin: 0 auto;
 }
  
 .circle { 
@@ -68,8 +74,12 @@ ul {
 .transit { 
     display: flex; 
     align-items: center; 
-    background-color: rgb(244, 244, 244); 
+    background-color: rgb(245, 245, 245);
 } 
+
+.log-container > .transit {
+    padding: 0 25px;
+}
 
 .search-bar {
     display: flex; 
