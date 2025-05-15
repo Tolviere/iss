@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>ISS | logs</title>
     <link rel="stylesheet" href="main-style.css">
 </head>
-<body>
+<body style="background-color: rgb(244, 244, 244);">
     <div class="top-header">
         <h1>THE ISS</h1>
+        <form class="search-bar">
+            <img width='20px' height='20px' src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%3Fid%3DOIP.k2gWA5dZjiTrXjJMA2XlIwAAAA%26cb%3Diwc2%26pid%3DApi&f=1&ipt=4f767e311f086cc1a265d6dab8384c5784284a23a32e994ca10ed046b0cefc37">
+            <input type="text" placeholder="">
+        </form>
         <ul>
             <li><a href="index.html">home</a></li>
             <li><a href="transit.html">transit</a></li>
             <li><a href="logs.html">logs</a></li>
         </ul>
     </div>
-    <form class="search-bar">
-        <input type="text" placeholder="Search...">
-    </form>
     <div class="log-container"></div>
 </body>
 
@@ -92,7 +93,9 @@
             log.appendChild(circle)
 
             let para = document.createElement('p') 
-            para.innerHTML = `<b>${student_name}</b> ${transit_message} <b>Room ${room_num}</b> at ${logs[i].time}`
+            let concise_time = logs[i].time.slice(0, logs[i].time.indexOf('GMT'))
+            
+            para.innerHTML = `<b>${student_name}</b> ${transit_message} <b>Room ${room_num}</b> at ${concise_time.slice(0, concise_time.indexOf(':')-2)}<b>${concise_time.slice(concise_time.indexOf(':')-2)}</b>`
             log.appendChild(para)
 
             logContainer.appendChild(log)
