@@ -19,15 +19,6 @@
     </div> 
 
     <div class="transit-container"> 
-        <div class="transit"> 
-            <div class="circle"></div> 
-            <p><b>Mafjslkdf wrei23</b> left <b>2:30</b> minutes ago from <b>Room 213</b></p> 
-        </div> 
-
-        <div class="transit"> 
-            <div class="circle"></div> 
-            <p><b>sdf wer2</b> left <b>5:21</b> minutes ago from <b>Room 218</b></p> 
-        </div> 
     </div> 
 </body> 
 
@@ -81,36 +72,36 @@
 
             current_id++ 
         } 
-
-     //   setInterval(updateTime, 1000) 
-        //setInterval(responseAPI, 1000) 
     } 
 
     async function getData(src) { 
         const res = await fetch(src) 
         const data = await res.json() 
-        console.log(data)
+
         return data; 
     } 
 
     async function updateTime() { 
-        let returned = await getData('http://localhost:3000/DATA-transit-returned') 
-        returned.reverse() 
+        let allTransit = await getData('http://localhost:3000/DATA-transit') 
+        allTransit.reverse() 
 
-        transit_container.children.foreach(child => { 
+        Array.from(transit_container.children).forEach(child => { 
             //let startingIndex = child.innerHTML.indexOf(child.data('data-mins')); 
-            console.log('bruh')
-            let timeElapsed = Math.floor((new Date - new Date(transits[i].time)) / 1000)
+            let elapsed_time = Math.floor((new Date - new Date(child.getAttribute('data-time'))) / 1000)
             let mins = Math.floor(elapsed_time / 60)
             let secs = elapsed_time - mins * 60
-            child.innerHTML = getOutString(child.data('data-student-name'), mins, secs, child.data('data-room-num')) 
 
-            let circle = child.querySelector('.circle') 
+            if (mins < 10) mins = `0${mins}`
+            if (secs < 10) secs = `0${secs}`
+
+            let timeElement = child.querySelector('.time')
+            timeElement.textContent = `${mins}:${secs}`
+
+            let circle = child.querySelector('.circle')
             if (mins > 10) circle.style.backgroundColor = red
             else if (mins > 5) circle.style.backgroundColor = yellow
 
-            //if (child.data('data-mins')) 
-            if(returned.find(log => log.student_id === child.data('data-student-id'))) { 
+            if(allTransit.find(log => log.student_id === child.getAttribute('data-student-id') && log.transit_status !== 'GOING')) { 
                 transit_container.removeChild(child) 
             } 
         }) 
@@ -119,11 +110,14 @@
     async function getOutString(name, mins, secs, room) { 
         if (mins < 10) mins = `0${mins}`
         if (secs < 10) secs = `0${secs}`
-        return `<b>${name}</b> left <b>${mins}:${secs}</b> minutes ago from <b>Room ${room}</b>` 
+        return `<b>${name}</b> left <b class='time'>${mins}:${secs}</b> minutes ago from <b>Room ${room}</b>` 
     } 
 
     responseAPI(); 
 
+
+    setInterval(updateTime, 1000) 
+    setInterval(responseAPI, 1000) 
 </script> 
 </html> 
 

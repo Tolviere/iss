@@ -76,7 +76,7 @@ app.get('/DATA-room-nums', (req, res) => {
   db.all(`SELECT ip, room_number FROM rooms ORDER BY id DESC`, [], (err, rows) => res.json(rows)) 
 }) 
 
-app.get('DATA-transit', (req, res) => {
+app.get('/DATA-transit', (req, res) => {
   db.all(`SELECT * FROM logs WHERE id IN (SELECT max(id) FROM logs GROUP BY student_id)`, [], (err, rows) => res.json(rows))
 })
 
