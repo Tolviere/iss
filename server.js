@@ -28,19 +28,24 @@ const server = net.createServer((socket) => {
 }) 
 
 function updateLogs(input_id, input_ip) { 
-  db.all(`SELECT * FROM logs WHERE student_id = ${input_id}`, [], (err, rows) => {
-    db.get(`SELECT room_number, rooms.ip FROM rooms JOIN logs ON logs.ip=rooms.ip WHERE student_id=${input_id} AND transit_status='GOING'`, [], (err, room) => {
-      let room_num = room.room_number
-      let transit
-      let prev_log = rows.reverse()[0]
-      if (!prev_log.transit_status || prev_log.transit_status === undefined || prev_log.ip !== input_ip) { 
-        transit = 'ARRIVED' 
-      if (prev_log.transit_status === 'GOING' && room_num) { 
-        transit = 'RETURNED' 
-      } else if ((prev_log.transit_status === 'ARRIVED' || prev_log.transit_status === 'RETURNED') && room_num) { 
-        transit = 'GOING' 
+  db.get(`SELECT * FROM logs WHERE student_id = ${input_id} ORDER BY id DESC`, [], (err, prev_log) => {
+    db.get(`SELECT * FROM rooms WHERE ip = '${input_ip}' ORDER BY id DESC`, [], (err, room) => {
+
+      let room_num = 'ROOM NUMBER'
+      if (room) {
+        room_num = room.room_number
       } 
-      db.run(`INSERT INTO logs (ip, time, student_id, transit_status) VALUES ('${input_ip}', '${new Date()}', ${input_id}, '${transit}')`); 
+      
+      let transit
+      if (!prev_log || !prev_log.transit_status || prev_log.transit_status === 'undefined' || prev_log.room !== room_num) { 
+          transit = 'ARRIVED' 
+      } else if (prev_log.transit_status === 'GOING' && room_num === prev_log.room) { 
+          transit = 'RETURNED' 
+      } else if ((prev_log.transit_status === 'ARRIVED' || prev_log.transit_status === 'RETURNED') && room_num === prev_log.room) { 
+          transit = 'GOING' 
+      } 
+
+      db.run(`INSERT INTO logs (ip, time, student_id, transit_status, room) VALUES ('${input_ip}', '${new Date()}', ${input_id}, '${transit}', '${room_num}')`); 
     })
   })
 } 
