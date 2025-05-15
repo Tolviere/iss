@@ -22,29 +22,44 @@
 </body>
 
 <script>
+    const logContainer = document.querySelector('.log-container')  
+    
+    let tStud = ''
+    const form = document.querySelector('form') 
+    form.addEventListener('submit', e => {
+        e.preventDefault()
+
+        Array.from(logContainer.children).forEach(child => logContainer.removeChild(child))
+
+        tStud = form.querySelector('input').value
+        responseAPI(form.querySelector('input').value)
+    })
+
 
     const green = 'rgb(120, 240, 120)'
     const yellow = 'rgb(254, 254, 67)'
     const red = 'rgb(230, 80, 80)'
 
-    const responseAPI = async () => {
+    const responseAPI = async (targetStudent) => {
         let names = await getData('http://localhost:3000/DATA-names')
         let logs = await getData('http://localhost:3000/DATA-full-logs')
         let roomNums = await getData('http://localhost:3000/DATA-room-nums')
         let transits = await getData('http://localhost:3000/DATA-transit-going') 
         logs.reverse()
 
-
-        const logContainer = document.querySelector('.log-container')
-
         for (let i = 0; i < logs.length; i++) {
-            let log = document.createElement('div')
-            log.classList.add('transit')
-
             let student_name = names.find(nameDict => nameDict.student_id === logs[i].student_id);
 
             if (!student_name) student_name = 'NAME'
             else student_name = student_name.name
+
+            console.log(targetStudent)
+            if (targetStudent !== '' && targetStudent.toLowerCase() !== student_name.toLowerCase()) {
+                continue;
+            }
+            
+            let log = document.createElement('div')
+            log.classList.add('transit')
 
             let room_num = logs[i].room
 
@@ -54,42 +69,30 @@
             circle.classList.add('circle')
 
             let t = new Date(logs[i].time)
-            
-            /*
-            if (i !== 0 && logs[i-1].transit_status === 'GOING') {
-                console.log('bruh')
-                let tDiff = new Date(logs[i].time) - new Date(logs[i-1])
-                let mins = Math.floor(Math.floor(tDiff / 1000) / 60)
-                if (mins >= 10) circle.style.backgroundColor = red
-                else if (mins >= 5) circle.style.backgroundColor = yellow
-            }*/
+            let transit_message
             if (logs[i].transit_status === 'ARRIVED') {
+                transit_message = 'arrived at'
                 circle.style.backgroundColor = getArrivedStatus(t)
             } else if (logs[i].transit_status === 'RETURNED') {
-                console.log('bruh')
+                transit_message = 'returned to'
                 let departureT;
-               // let departureT = new Date(logs.find(log => log.student_id === logs[i].student_id && log.transit_status === 'GOING' && d).time)
                for (let j = i; j < logs.length; j++) {
                 if (logs[j].transit_status === 'GOING') {
                     departureT = new Date(logs[j].time)
-                    console.log(`mins: ${Math.floor(Math.floor((t - departureT) / 1000) / 60)}, returned: ${logs[i].time}, left: ${logs[j].time}`)
-                //    console.log(logs[j])
-                //    console.log(logs[i])
                     break;
-
                 } 
                }
-               // console.log(transits.reverse().find(transit => transit.student_id === logs[i].student_id))
-              //  console.log(logs[i])
                 let mins = Math.floor(Math.floor((t - departureT) / 1000) / 60)
                 if (mins >= 10) circle.style.backgroundColor = red
                 else if (mins >= 5) circle.style.backgroundColor = yellow
+            } else if (logs[i].transit_status === 'GOING') {
+                transit_message = 'left from'
             }
 
             log.appendChild(circle)
 
             let para = document.createElement('p') 
-            para.innerHTML = `${student_name} ${logs[i].transit_status} at Room ${room_num} (${logs[i].ip}) at ${logs[i].time}`
+            para.innerHTML = `<b>${student_name}</b> ${transit_message} <b>Room ${room_num}</b> at ${logs[i].time}`
             log.appendChild(para)
 
             logContainer.appendChild(log)
@@ -140,6 +143,6 @@
         return data;
     }
 
-    responseAPI();
+    responseAPI(tStud);
 </script>
 </html>
