@@ -6,7 +6,7 @@
     <title>ISS | logs</title>
     <link rel="stylesheet" href="main-style.css">
 </head>
-<body style="background-color: rgb(244, 244, 244);">
+<body>
     <div class="top-header">
         <h1>THE ISS</h1>
         <form class="search-bar">
@@ -27,13 +27,19 @@
     
     let tStud = ''
     const form = document.querySelector('form') 
+    const input = form.querySelector('input')
+    input.value = ''
+
     form.addEventListener('submit', e => {
         e.preventDefault()
 
         Array.from(logContainer.children).forEach(child => logContainer.removeChild(child))
 
-        tStud = form.querySelector('input').value
-        responseAPI(form.querySelector('input').value)
+        tStud = input.value
+
+        responseAPI(input.value)
+
+        input.value = ''
     })
 
 
