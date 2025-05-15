@@ -35,13 +35,14 @@
     let current_id = 0 
 
     const transit_container = document.querySelector('.transit-container')     
+    const green = 'rgb(120, 240, 120)'
+    const yellow = 'rgb(254, 254, 67)'
+    const red = 'rgb(230, 80, 80)'
 
     const responseAPI = async () => { 
         let names = await getData('http://localhost:3000/DATA-names') 
-        let roomNums = await getData('http://localhost:3000/DATA-room-nums') 
+       // let roomNums = await getData('http://localhost:3000/DATA-room-nums') 
         let transits = await getData('http://localhost:3000/DATA-transit-going') 
-
-        transits.reverse() 
 
         for (let i = current_id; i < transits.length; i++) { 
             let transit = document.createElement('div') 
@@ -51,24 +52,29 @@
             if (!student_name) student_name = 'NAME' 
             else student_name = student_name.name 
 
-            let room_num = roomNums.find(roomDict => roomDict.ip === transits[i].ip); 
-            if (!room_num) room_num = 'ROOM NUMBER' 
-            else room_num = room_num.room_number 
+            let room_num = transits[i].room
+            if (!room_num) room_num = 'NOT FOUND' 
 
-            let elapsed_time = new Date - transits[i].time 
+            let elapsed_time = Math.floor((new Date - new Date(transits[i].time)) / 1000)
+            let mins = Math.floor(elapsed_time / 60)
+            let secs = elapsed_time - mins * 60
 
-            transit.setAttribute('data-mins', elapsed_time.getMinutes()) 
+            transit.setAttribute('data-mins', mins) 
+            transit.setAttribute('data-secs', secs)
             transit.setAttribute('data-time', transits[i].time) 
-            transit.setAttribute('data-student-id', transit[i].student_id) 
+            transit.setAttribute('data-student-id', transits[i].student_id) 
             transit.setAttribute('data-student-name', student_name) 
             transit.setAttribute('data-room-num', room_num) 
 
             let circle = document.createElement('div') 
             circle.classList.add('circle') 
+            if (mins > 10) circle.style.backgroundColor = red
+            else if (mins > 5) circle.style.backgroundColor = yellow
+
             transit.appendChild(circle) 
 
             let para = document.createElement('p') 
-            para.innerHTML = await getOutString(student_name, elapsed_time.getMinutes(), elapsed_time.getSeconds(), room_num) 
+            para.innerHTML = await getOutString(student_name, transit.getAttribute('data-mins'), transit.getAttribute('data-secs'), room_num) 
             transit.appendChild(para) 
 
             transit_container.appendChild(transit) 
@@ -76,13 +82,14 @@
             current_id++ 
         } 
 
-        setInterval(updateTime, 1000) 
-        setInterval(responseAPI, 1000) 
+     //   setInterval(updateTime, 1000) 
+        //setInterval(responseAPI, 1000) 
     } 
 
     async function getData(src) { 
         const res = await fetch(src) 
         const data = await res.json() 
+        console.log(data)
         return data; 
     } 
 
@@ -92,10 +99,15 @@
 
         transit_container.children.foreach(child => { 
             //let startingIndex = child.innerHTML.indexOf(child.data('data-mins')); 
-            let timeElapsed = new Date - child.data('data-time') 
-            child.innerHTML = getOutString(child.data('data-student-name'), timeElapsed.getMinutes(), timeElapsed.getSeconds(), child.data('data-room-num')) 
+            console.log('bruh')
+            let timeElapsed = Math.floor((new Date - new Date(transits[i].time)) / 1000)
+            let mins = Math.floor(elapsed_time / 60)
+            let secs = elapsed_time - mins * 60
+            child.innerHTML = getOutString(child.data('data-student-name'), mins, secs, child.data('data-room-num')) 
 
             let circle = child.querySelector('.circle') 
+            if (mins > 10) circle.style.backgroundColor = red
+            else if (mins > 5) circle.style.backgroundColor = yellow
 
             //if (child.data('data-mins')) 
             if(returned.find(log => log.student_id === child.data('data-student-id'))) { 
@@ -105,7 +117,9 @@
     } 
 
     async function getOutString(name, mins, secs, room) { 
-        return `<b>${name}</b> left ${mins}:${secs} minutes ago from Room ${room}` 
+        if (mins < 10) mins = `0${mins}`
+        if (secs < 10) secs = `0${secs}`
+        return `<b>${name}</b> left <b>${mins}:${secs}</b> minutes ago from <b>Room ${room}</b>` 
     } 
 
     responseAPI(); 

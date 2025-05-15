@@ -35,7 +35,7 @@ function updateLogs(input_id, input_ip) {
       if (room) {
         room_num = room.room_number
       } 
-      
+
       let transit
       if (!prev_log || !prev_log.transit_status || prev_log.transit_status === 'undefined' || prev_log.room !== room_num) { 
           transit = 'ARRIVED' 
@@ -73,19 +73,21 @@ app.get('/DATA-names', (req, res) => {
 }) 
 
 app.get('/DATA-room-nums', (req, res) => { 
-  db.all(`SELECT ip, room_number FROM rooms`, [], (err, rows) => res.json(rows)) 
+  db.all(`SELECT ip, room_number FROM rooms ORDER BY id DESC`, [], (err, rows) => res.json(rows)) 
 }) 
 
- 
+app.get('DATA-transit', (req, res) => {
+  db.all(`SELECT * FROM logs WHERE id IN (SELECT max(id) FROM logs GROUP BY student_id)`, [], (err, rows) => res.json(rows))
+})
 
 app.get('/DATA-transit-going', (req, res) => { 
-  db.all(`SELECT id, student_id, transit_status, time, ip FROM logs WHERE transit_status = 'GOING'`, [], (err, rows) => res.json(rows)) 
+  db.all(`SELECT * FROM logs WHERE id IN (SELECT max(id) FROM logs GROUP BY student_id) AND transit_status = 'GOING'`, [], (err, rows) => res.json(rows)) 
 }) 
 
  
 
 app.get('/DATA-transit-returned', (req, res) => { 
-  db.all(`SELECT student_id, transit_status, time, ip FROM logs WHERE transit_status = 'RETURNED'`, [], (err, rows) => res.json(rows)) 
+  db.all(`SELECT * FROM logs WHERE id IN (SELECT max(id) FROM logs GROUP BY student_id) AND transit_status = 'RETURNED'`, [], (err, rows) => res.json(rows)) 
 }) 
 
  
