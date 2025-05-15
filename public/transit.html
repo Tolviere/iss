@@ -46,7 +46,7 @@
             else student_name = student_name.name 
 
             let room_num = transits[i].room
-            if (!room_num) room_num = 'NOT FOUND' 
+            if (!room_num) room_num = 'ROOM_NUMBER' 
 
             let elapsed_time = Math.floor((new Date - new Date(transits[i].time)) / 1000)
             let mins = Math.floor(elapsed_time / 60)

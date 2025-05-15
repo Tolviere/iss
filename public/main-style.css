@@ -28,7 +28,7 @@ ul {
     color: rgb(230, 227, 227); 
 } 
 
-.transit-container { 
+.transit-container, .log-container { 
     display: flex; 
     flex-direction: column; 
     height: 100px; 

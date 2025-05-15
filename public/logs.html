@@ -15,37 +15,125 @@
             <li><a href="logs.html">logs</a></li>
         </ul>
     </div>
+    <form class="search-bar">
+        <input type="text" placeholder="Search...">
+    </form>
     <div class="log-container"></div>
 </body>
 
 <script>
+
+    const green = 'rgb(120, 240, 120)'
+    const yellow = 'rgb(254, 254, 67)'
+    const red = 'rgb(230, 80, 80)'
+
     const responseAPI = async () => {
         let names = await getData('http://localhost:3000/DATA-names')
         let logs = await getData('http://localhost:3000/DATA-full-logs')
         let roomNums = await getData('http://localhost:3000/DATA-room-nums')
+        let transits = await getData('http://localhost:3000/DATA-transit-going') 
         logs.reverse()
+
 
         const logContainer = document.querySelector('.log-container')
 
         for (let i = 0; i < logs.length; i++) {
             let log = document.createElement('div')
-            log.classList.add('log')
+            log.classList.add('transit')
 
             let student_name = names.find(nameDict => nameDict.student_id === logs[i].student_id);
 
             if (!student_name) student_name = 'NAME'
             else student_name = student_name.name
 
-            let room_num = roomNums.find(roomDict => roomDict.ip === logs[i].ip);
+            let room_num = logs[i].room
 
-            if (!room_num) room_num = 'ROOM NUMBER'
-            else room_num = room_num.room_number
+            if (!room_num) room_num = 'ROOM_NUMBER'
 
-            log.textContent = `${student_name} (${logs[i].student_id}) scanned at Room ${room_num} (${logs[i].ip}) at ${logs[i].time}`
+            let circle = document.createElement('div')
+            circle.classList.add('circle')
+
+            let t = new Date(logs[i].time)
+            
+            /*
+            if (i !== 0 && logs[i-1].transit_status === 'GOING') {
+                console.log('bruh')
+                let tDiff = new Date(logs[i].time) - new Date(logs[i-1])
+                let mins = Math.floor(Math.floor(tDiff / 1000) / 60)
+                if (mins >= 10) circle.style.backgroundColor = red
+                else if (mins >= 5) circle.style.backgroundColor = yellow
+            }*/
+            if (logs[i].transit_status === 'ARRIVED') {
+                circle.style.backgroundColor = getArrivedStatus(t)
+            } else if (logs[i].transit_status === 'RETURNED') {
+                console.log('bruh')
+                let departureT;
+               // let departureT = new Date(logs.find(log => log.student_id === logs[i].student_id && log.transit_status === 'GOING' && d).time)
+               for (let j = i; j < logs.length; j++) {
+                if (logs[j].transit_status === 'GOING') {
+                    departureT = new Date(logs[j].time)
+                    console.log(`mins: ${Math.floor(Math.floor((t - departureT) / 1000) / 60)}, returned: ${logs[i].time}, left: ${logs[j].time}`)
+                //    console.log(logs[j])
+                //    console.log(logs[i])
+                    break;
+
+                } 
+               }
+               // console.log(transits.reverse().find(transit => transit.student_id === logs[i].student_id))
+              //  console.log(logs[i])
+                let mins = Math.floor(Math.floor((t - departureT) / 1000) / 60)
+                if (mins >= 10) circle.style.backgroundColor = red
+                else if (mins >= 5) circle.style.backgroundColor = yellow
+            }
+
+            log.appendChild(circle)
+
+            let para = document.createElement('p') 
+            para.innerHTML = `${student_name} ${logs[i].transit_status} at Room ${room_num} (${logs[i].ip}) at ${logs[i].time}`
+            log.appendChild(para)
+
             logContainer.appendChild(log)
         }
     }
 
+    function getTimeDiff(t1, hrs, mins) {
+       return hrs * 60 + mins - (t1.getHours() * 60 + t1.getMinutes())
+    }
+
+    function getArrivedStatus(t) {
+        switch (t) {
+            case t.getHours() <= 8 && t.getMinutes() <= 24:
+                return getColor(getTimeDiff(t, 7, 42))
+            case t.getHours() <= 9 && t.getMinutes() <= 9:
+                return getColor(getTimeDiff(t, 8, 27))
+            case t.getHours() <= 9 && t.getMinutes() <= 54:
+                return getColor(getTimeDiff(t, 9, 12))
+            case t.getHours() <= 10 && t.getMinutes() <= 39:
+                getColor(getTimeDiff(t, 9, 57))
+            case t.getHours() <= 11 && t.getMinutes() <= 24:
+                return getColor(getTimeDiff(t, 10, 42))
+            case t.getHours() <= 12 && t.getMinutes() <= 9:
+                return getColor(getTimeDiff(t, 11, 27))
+            case t.getHours() <= 12 && t.getMinutes() <= 54:
+                return getColor(getTimeDiff(t, 12, 12))
+            case t.getHours() <= 13 && t.getMinutes() <= 39:
+                return getColor(getTimeDiff(t, 12, 57))
+            case t.getHours() <= 14 && t.getMinutes() <= 25:
+                return getColor(getTimeDiff(t, 13, 43))
+            default:
+                return green
+        }
+    }
+    function getColor(timeDiff) {
+        switch (timeDiff) {
+            case timeDiff < 0: 
+                return yellow
+            case timeDiff <= -5:
+                return red
+            default:
+                return green
+        }
+    }
     async function getData(src) {
         const res = await fetch(src)
         const data = await res.json()
