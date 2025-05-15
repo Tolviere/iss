@@ -1,0 +1,116 @@
+<!DOCTYPE html> 
+
+<html lang="en"> 
+
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Document</title> 
+    <link rel="stylesheet" href="main-style.css"> 
+</head> 
+
+<body> 
+    <div class="top-header"> 
+        <h1>THE ISS</h1> 
+        <ul> 
+            <li><a href="index.html">home</a></li> 
+            <li><a href="student-list.html">logs</a></li> 
+        </ul> 
+    </div> 
+
+    <div class="transit-container"> 
+        <div class="transit"> 
+            <div class="circle"></div> 
+            <p><b>Mafjslkdf wrei23</b> left <b>2:30</b> minutes ago from <b>Room 213</b></p> 
+        </div> 
+
+        <div class="transit"> 
+            <div class="circle"></div> 
+            <p><b>sdf wer2</b> left <b>5:21</b> minutes ago from <b>Room 218</b></p> 
+        </div> 
+    </div> 
+</body> 
+
+<script> 
+    let current_id = 0 
+
+    const transit_container = document.querySelector('.transit-container')     
+
+    const responseAPI = async () => { 
+        let names = await getData('http://localhost:3000/DATA-names') 
+        let roomNums = await getData('http://localhost:3000/DATA-room-nums') 
+        let transits = await getData('http://localhost:3000/DATA-transit-going') 
+
+        transits.reverse() 
+
+        for (let i = current_id; i < transits.length; i++) { 
+            let transit = document.createElement('div') 
+            transit.classList.add('transit') 
+
+            let student_name = names.find(nameDict => nameDict.student_id === transits[i].student_id); 
+            if (!student_name) student_name = 'NAME' 
+            else student_name = student_name.name 
+
+            let room_num = roomNums.find(roomDict => roomDict.ip === transits[i].ip); 
+            if (!room_num) room_num = 'ROOM NUMBER' 
+            else room_num = room_num.room_number 
+
+            let elapsed_time = new Date - transits[i].time 
+
+            transit.setAttribute('data-mins', elapsed_time.getMinutes()) 
+            transit.setAttribute('data-time', transits[i].time) 
+            transit.setAttribute('data-student-id', transit[i].student_id) 
+            transit.setAttribute('data-student-name', student_name) 
+            transit.setAttribute('data-room-num', room_num) 
+
+            let circle = document.createElement('div') 
+            circle.classList.add('circle') 
+            transit.appendChild(circle) 
+
+            let para = document.createElement('p') 
+            para.innerHTML = await getOutString(student_name, elapsed_time.getMinutes(), elapsed_time.getSeconds(), room_num) 
+            transit.appendChild(para) 
+
+            transit_container.appendChild(transit) 
+
+            current_id++ 
+        } 
+
+        setInterval(updateTime, 1000) 
+        setInterval(responseAPI, 1000) 
+    } 
+
+    async function getData(src) { 
+        const res = await fetch(src) 
+        const data = await res.json() 
+        return data; 
+    } 
+
+    async function updateTime() { 
+        let returned = await getData('http://localhost:3000/DATA-transit-returned') 
+        returned.reverse() 
+
+        transit_container.children.foreach(child => { 
+            //let startingIndex = child.innerHTML.indexOf(child.data('data-mins')); 
+            let timeElapsed = new Date - child.data('data-time') 
+            child.innerHTML = getOutString(child.data('data-student-name'), timeElapsed.getMinutes(), timeElapsed.getSeconds(), child.data('data-room-num')) 
+
+            let circle = child.querySelector('.circle') 
+
+            //if (child.data('data-mins')) 
+            if(returned.find(log => log.student_id === child.data('data-student-id'))) { 
+                transit_container.removeChild(child) 
+            } 
+        }) 
+    } 
+
+    async function getOutString(name, mins, secs, room) { 
+        return `<b>${name}</b> left ${mins}:${secs} minutes ago from Room ${room}` 
+    } 
+
+    responseAPI(); 
+
+</script> 
+</html> 
+
+ 
