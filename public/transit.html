@@ -105,7 +105,6 @@
 
             let timeElement = child.querySelector('.time')
             timeElement.textContent = `${mins}:${secs}`
-            console.log('ongoabo')
             if(allTransit.find(log => log.student_id == child.getAttribute('data-student-id')).transit_status !== 'GOING') { 
                 transit_container.removeChild(child) 
             } 
@@ -123,6 +122,8 @@
 
     setInterval(updateTime, 1000) 
     setInterval(responseAPI, 1000) 
+
+
 </script> 
 </html> 
 

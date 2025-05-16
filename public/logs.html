@@ -60,7 +60,6 @@
             if (!student_name) student_name = 'NAME'
             else student_name = student_name.name
 
-            console.log(targetStudent)
             if (targetStudent !== '' && targetStudent.toLowerCase() !== student_name.toLowerCase()) {
                 continue;
             }
@@ -102,6 +101,8 @@
             let concise_time = logs[i].time.slice(0, logs[i].time.indexOf('GMT'))
             
             para.innerHTML = `<b>${student_name}</b> ${transit_message} <b>Room ${room_num}</b> at ${concise_time.slice(0, concise_time.indexOf(':')-2)}<b>${concise_time.slice(concise_time.indexOf(':')-2)}</b>`
+           //para.innerHTML = `<b>${student_name}</b> ${transit_message} <b>Room ${room_num}</b> at ${logs[i].time}</b>`
+
             log.appendChild(para)
 
             logContainer.appendChild(log)
@@ -113,38 +114,44 @@
     }
 
     function getArrivedStatus(t) {
-        switch (t) {
-            case t.getHours() <= 8 && t.getMinutes() <= 24:
-                return getColor(getTimeDiff(t, 7, 42))
-            case t.getHours() <= 9 && t.getMinutes() <= 9:
-                return getColor(getTimeDiff(t, 8, 27))
-            case t.getHours() <= 9 && t.getMinutes() <= 54:
-                return getColor(getTimeDiff(t, 9, 12))
-            case t.getHours() <= 10 && t.getMinutes() <= 39:
-                getColor(getTimeDiff(t, 9, 57))
-            case t.getHours() <= 11 && t.getMinutes() <= 24:
-                return getColor(getTimeDiff(t, 10, 42))
-            case t.getHours() <= 12 && t.getMinutes() <= 9:
-                return getColor(getTimeDiff(t, 11, 27))
-            case t.getHours() <= 12 && t.getMinutes() <= 54:
-                return getColor(getTimeDiff(t, 12, 12))
-            case t.getHours() <= 13 && t.getMinutes() <= 39:
-                return getColor(getTimeDiff(t, 12, 57))
-            case t.getHours() <= 14 && t.getMinutes() <= 25:
-                return getColor(getTimeDiff(t, 13, 43))
-            default:
-                return green
+        console.log (`hrs: ${t.getHours()} mins: ${t.getMinutes()}`)
+
+        if (t.getHours() <= 8 && t.getMinutes() <= 24) {
+            return getColor(getTimeDiff(t, 7, 42))
+        }
+        else if (t.getHours() <= 9 && t.getMinutes() <= 9) {
+            return getColor(getTimeDiff(t, 8, 27))
+        }
+        else if (t.getHours() <= 9 && t.getMinutes() <= 54) {
+            return getColor(getTimeDiff(t, 9, 12))
+        } 
+        else if (t.getHours() <= 10 && t.getMinutes() <= 39) {
+            return getColor(getTimeDiff(t, 9, 57))
+        }
+        else if (t.getHours() <= 11 && t.getMinutes() <= 24) {
+            return getColor(getTimeDiff(t, 10, 42))
+        }
+        else if (t.getHours() <= 12 && t.getMinutes() <= 9) {
+            return getColor(getTimeDiff(t, 11, 27))
+        }
+        else if (t.getHours() <= 12 && t.getMinutes() <= 54) {
+            return getColor(getTimeDiff(t, 12, 12))
+        }
+        else if (t.getHours() <= 13 && t.getMinutes() <= 39) {
+            return getColor(getTimeDiff(t, 12, 57))
+        }
+        else if (t.getHours() <= 14 && t.getMinutes() <= 25) {
+            return getColor(getTimeDiff(t, 13, 43))
+        }
+        else {
+            return green
         }
     }
     function getColor(timeDiff) {
-        switch (timeDiff) {
-            case timeDiff < 0: 
-                return yellow
-            case timeDiff <= -5:
-                return red
-            default:
-                return green
-        }
+        console.log(timeDiff)
+        if (timeDiff <= -5) return red
+        if (timeDiff < 0) return yellow
+        return green
     }
     async function getData(src) {
         const res = await fetch(src)
