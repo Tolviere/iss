@@ -75,6 +75,8 @@
             circle.classList.add('circle')
 
             let t = new Date(logs[i].time)
+            console.log(t)
+            console.log(t.getHours())
             let transit_message
             if (logs[i].transit_status === 'ARRIVED') {
                 transit_message = 'arrived at'
@@ -114,33 +116,37 @@
     }
 
     function getArrivedStatus(t) {
-        console.log (`hrs: ${t.getHours()} mins: ${t.getMinutes()}`)
+     //   console.log(t)
+       // console.log(t.getHours())
 
-        if (t.getHours() <= 8 && t.getMinutes() <= 24) {
+        let hrs = t.getHours() - 4
+        if (hrs <= 8 && t.getMinutes() <= 24) {
             return getColor(getTimeDiff(t, 7, 42))
         }
-        else if (t.getHours() <= 9 && t.getMinutes() <= 9) {
+        else if (hrs <= 9 && t.getMinutes() <= 9) {
             return getColor(getTimeDiff(t, 8, 27))
         }
-        else if (t.getHours() <= 9 && t.getMinutes() <= 54) {
+        else if (hrs <= 9 && t.getMinutes() <= 54) {
+            console.log(t)
+            console.log(hrs)
             return getColor(getTimeDiff(t, 9, 12))
         } 
-        else if (t.getHours() <= 10 && t.getMinutes() <= 39) {
+        else if (hrs <= 10 && t.getMinutes() <= 39) {
             return getColor(getTimeDiff(t, 9, 57))
         }
-        else if (t.getHours() <= 11 && t.getMinutes() <= 24) {
+        else if (hrs <= 11 && t.getMinutes() <= 24) {
             return getColor(getTimeDiff(t, 10, 42))
         }
-        else if (t.getHours() <= 12 && t.getMinutes() <= 9) {
+        else if (hrs <= 12 && t.getMinutes() <= 9) {
             return getColor(getTimeDiff(t, 11, 27))
         }
-        else if (t.getHours() <= 12 && t.getMinutes() <= 54) {
+        else if (hrs <= 12 && t.getMinutes() <= 54) {
             return getColor(getTimeDiff(t, 12, 12))
         }
-        else if (t.getHours() <= 13 && t.getMinutes() <= 39) {
+        else if (hrs <= 13 && t.getMinutes() <= 39) {
             return getColor(getTimeDiff(t, 12, 57))
         }
-        else if (t.getHours() <= 14 && t.getMinutes() <= 25) {
+        else if (hrs <= 14 && t.getMinutes() <= 25) {
             return getColor(getTimeDiff(t, 13, 43))
         }
         else {
@@ -148,7 +154,6 @@
         }
     }
     function getColor(timeDiff) {
-        console.log(timeDiff)
         if (timeDiff <= -5) return red
         if (timeDiff < 0) return yellow
         return green
