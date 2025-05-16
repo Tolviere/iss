@@ -24,8 +24,6 @@
 </body> 
 
 <script> 
-    let current_id = 0 
-
     const transit_container = document.querySelector('.transit-container')     
     const green = 'rgb(120, 240, 120)'
     const yellow = 'rgb(254, 254, 67)'
@@ -33,7 +31,6 @@
 
     const responseAPI = async () => { 
         let names = await getData('http://localhost:3000/DATA-names') 
-       // let roomNums = await getData('http://localhost:3000/DATA-room-nums') 
         let transits = await getData('http://localhost:3000/DATA-transit-going') 
 
         for (let i = 0; i < transits.length; i++) { 
@@ -73,15 +70,12 @@
             transit.appendChild(para) 
 
             transit_container.appendChild(transit) 
-
-            current_id++ 
         } 
     } 
 
     async function getData(src) { 
         const res = await fetch(src) 
         const data = await res.json() 
-
         return data; 
     } 
 
@@ -90,12 +84,10 @@
         allTransit.reverse() 
 
         Array.from(transit_container.children).forEach(child => { 
-            //let startingIndex = child.innerHTML.indexOf(child.data('data-mins')); 
             let elapsed_time = Math.floor((new Date - new Date(child.getAttribute('data-time'))) / 1000)
             let mins = Math.floor(elapsed_time / 60)
             let secs = elapsed_time - mins * 60
 
-            console.log(mins)
             let circle = child.querySelector('.circle')
             if (mins >= 10) circle.style.backgroundColor = red
             else if (mins >= 5) circle.style.backgroundColor = yellow

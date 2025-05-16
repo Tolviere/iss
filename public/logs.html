@@ -42,12 +42,14 @@
         input.value = ''
     })
 
-
     const green = 'rgb(120, 240, 120)'
     const yellow = 'rgb(254, 254, 67)'
     const red = 'rgb(230, 80, 80)'
 
     const responseAPI = async (targetStudent) => {
+        let input = targetStudent.split(':')
+        
+
         let names = await getData('http://localhost:3000/DATA-names')
         let logs = await getData('http://localhost:3000/DATA-full-logs')
         let roomNums = await getData('http://localhost:3000/DATA-room-nums')
@@ -60,7 +62,7 @@
             if (!student_name) student_name = 'NAME'
             else student_name = student_name.name
 
-            if (targetStudent !== '' && targetStudent.toLowerCase() !== student_name.toLowerCase()) {
+            if ((input[0] !== '' && input[0].toLowerCase() !== student_name.toLowerCase()) || (input[1] && input[1].toLowerCase() !== logs[i].transit_status.toLowerCase())) {
                 continue;
             }
             
@@ -75,25 +77,27 @@
             circle.classList.add('circle')
 
             let t = new Date(logs[i].time)
-            console.log(t)
-            console.log(t.getHours())
+
             let transit_message
             if (logs[i].transit_status === 'ARRIVED') {
                 transit_message = 'arrived at'
                 circle.style.backgroundColor = getArrivedStatus(t)
-            } else if (logs[i].transit_status === 'RETURNED') {
+            } 
+            else if (logs[i].transit_status === 'RETURNED') {
                 transit_message = 'returned to'
                 let departureT;
-               for (let j = i; j < logs.length; j++) {
-                if (logs[j].transit_status === 'GOING') {
-                    departureT = new Date(logs[j].time)
-                    break;
-                } 
-               }
+
+                for (let j = i; j < logs.length; j++) {
+                    if (logs[j].transit_status === 'GOING') {
+                        departureT = new Date(logs[j].time)
+                        break;
+                    } 
+                }
                 let mins = Math.floor(Math.floor((t - departureT) / 1000) / 60)
                 if (mins >= 10) circle.style.backgroundColor = red
                 else if (mins >= 5) circle.style.backgroundColor = yellow
-            } else if (logs[i].transit_status === 'GOING') {
+            } 
+            else if (logs[i].transit_status === 'GOING') {
                 transit_message = 'left from'
             }
 
@@ -103,8 +107,6 @@
             let concise_time = logs[i].time.slice(0, logs[i].time.indexOf('GMT'))
             
             para.innerHTML = `<b>${student_name}</b> ${transit_message} <b>Room ${room_num}</b> at ${concise_time.slice(0, concise_time.indexOf(':')-2)}<b>${concise_time.slice(concise_time.indexOf(':')-2)}</b>`
-           //para.innerHTML = `<b>${student_name}</b> ${transit_message} <b>Room ${room_num}</b> at ${logs[i].time}</b>`
-
             log.appendChild(para)
 
             logContainer.appendChild(log)
@@ -116,9 +118,6 @@
     }
 
     function getArrivedStatus(t) {
-     //   console.log(t)
-       // console.log(t.getHours())
-
         let hrs = t.getHours() - 4
         if (hrs <= 8 && t.getMinutes() <= 24) {
             return getColor(getTimeDiff(t, 7, 42))
@@ -127,8 +126,6 @@
             return getColor(getTimeDiff(t, 8, 27))
         }
         else if (hrs <= 9 && t.getMinutes() <= 54) {
-            console.log(t)
-            console.log(hrs)
             return getColor(getTimeDiff(t, 9, 12))
         } 
         else if (hrs <= 10 && t.getMinutes() <= 39) {
